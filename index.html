@@ -1,0 +1,108 @@
+<html>
+
+<head>
+
+<title>Plotter</title>
+<style>
+canvas {
+	border: 1px solid black;
+}
+</style>
+
+</head>
+
+<body>
+
+<canvas id="canvas" width="500" height="500"></canvas>
+<textarea id="code" rows="25" cols="80" spellcheck="false">draw_line(0, 0, 1, 1);</textarea>
+<button id="run">Run</button>
+<textarea rows="25" cols="80" spellcheck="false">put dummy stuff here</textarea>
+<br>
+<textarea id="generated" rows="25" cols="80" spellcheck="false" readonly="true">generated</textarea>
+
+<script>
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+
+var num_pts = 0;
+
+function X(x) {
+	return (1-x)*canvas.width;
+}
+
+function Y(y) {
+	return (1-y)*canvas.height;
+}
+
+function rand(a,b) {
+	return Math.random()*(b-a)+a;
+}
+
+function clear() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	generated.value = "";
+	num_pts=0;
+}
+
+function line(x0, y0, x1, y1, do_not_print) {
+	ctx.beginPath();
+	ctx.moveTo(X(x0), Y(y0));
+	ctx.lineTo(X(x1), Y(y1));
+	ctx.stroke();
+	if (do_not_print == undefined)
+		generated.value += "line("+x0.toFixed(9)+","+y0.toFixed(9)+","+x1.toFixed(9)+","+y1.toFixed(9)+");\n";
+	num_pts += 2;
+}
+
+function point(x, y) {
+	line(x, y, x+1, y+1);	
+}
+
+function rect(x0, y0, x1, y1) {
+	line(x0, y0, x1, y0);
+	line(x1, y0, x1, y1);
+	line(x1, y1, x0, y1);
+	line(x0, y1, x0, y0);
+}
+
+function circle(x, y, r) {
+	var circumference = 2*Math.PI*r;
+	var n = Math.max(Math.ceil(circumference/0.025),25);
+	for (var i=0; i<n; i++) {
+		var angle0 = i/(n-1)*2*Math.PI;
+		var angle1 = (i+1)/(n-1)*2*Math.PI;
+		line(x+Math.cos(angle0)*r,y+Math.sin(angle0)*r,
+			 x+Math.cos(angle1)*r,y+Math.sin(angle1)*r, true);
+	}
+	generated.value += "circle("+x.toFixed(9)+","+y.toFixed(9)+","+r.toFixed(9)+");\n";
+}
+
+function cube(x,y,l) {
+	rect(x+l,y+l,x-l,y-l);
+	rect(x+l+l,y+l+l,x-l+l,y-l+l);
+	line(x+l,y+l,x+l+l,y+l+l);
+	line(x-l,y+l,x-l+l,y+l+l);
+	line(x+l,y-l,x+l+l,y-l+l);
+	line(x-l,y-l,x-l+l,y-l+l);
+}
+
+var code = document.getElementById('code');
+var generated = document.getElementById('generated');
+
+var run = document.getElementById('run');
+run.onclick = function() {
+	clear();
+	try {
+		eval(code.value);
+		generated.value = "// " + num_pts + " points\n" + generated.value;
+	} catch (e) {
+		if (e instanceof SyntaxError) {
+			alert(e.message);
+		}
+	}
+};
+</script>
+
+</body>
+
+</html>
