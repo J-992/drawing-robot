@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project was a collaboration between Adam Sidat, Jaffer Razavi, Ben Jabal, and Samantha Chan to design and devlelop a drawing robot using a Lego EV3 Module as a CPU.
+This project was a collaboration to design and devlelop a drawing robot using a Lego EV3 Module as a CPU.
 
 
 
